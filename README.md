@@ -39,3 +39,33 @@ Generar una imagen docker y registrarla en [DockerRegistry](https://hub.docker.c
 
 1. Para crear el servicio REST es conveniente [RESTify](http://restify.com/) si bien se puede utilizar [Express](https://expressjs.com/)
 2. Para escribir las pruebas [Mocha](https://mochajs.org/)
+
+## Solucion
+
+1. Iniciar con "node server.js"
+
+2. Para obtener la hora actual ingresar la siguiente URL. 
+```
+http://localhost:8080/current
+```
+La respuesta será un JSON con la siguiente estructura:
+```
+{
+  seconds: true, (Si el indicador de segundos debe estar encendido o apagado)
+  hours1: 4,	(Cuantos indicadores deben encenderse en el 2do renglon horario)
+  hours5: 3,  (Indicadores del 1er renglon horario)
+  minutes1: 4, (Indicadores del 2do renglon de minutos)
+  minutes5: 1 (Indicadores del 1er renglon de minutos)
+}
+```
+
+3. Ingresar la forma en formato ISO-8601 como se indica a continuacion. La estructura del Json sera similar a la detallada en el punto anterior
+```
+http://localhost:8080/convert/2007-04-05T14:30
+```
+
+4. Para una visualizacion grafica ingresar a http://localhost:8080/display. Ademas del Berlin Clock se mostrará la cantidad de usuarios que se encuentren mirando el reloj en ese momento (uso de socket.io).
+
+5. Con http://localhost:8080/shutdown se puede detener el servidor (no es para uso en produccion, pensado solo para cuestiones de desarrollo).
+
+Para testear el software usar "npm test".

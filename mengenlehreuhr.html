@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>    <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>     <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>     <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Mengenlehreuhr</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+body{
+  font-family: Verdana;
+}
+.berlin-clock{
+  margin: auto;
+  text-align: center;
+  width: 150px;
+}
+.unit{
+  width: 30px;
+  height: 30px;
+  border:1px solid #ccc;
+  display: inline-block;
+}
+.unit:first-child{
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.unit:last-child{
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.sec.unit{
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+}
+.row{
+  margin: 5px 0;
+}
+.minute-top{
+  font-size:1px;
+}
+.minute-top .min.unit{
+  width: 7px;
+}
+.second-row .unit.on{
+  background-color: yellow;
+}
+.hour-top .unit.on, .hour-bottom .unit.on{
+  background-color: red;
+}
+.minute-top .unit.on, .minute-bottom .unit.on{
+  background-color: yellow;
+}
+.minute-top .unit:nth-child(3).on,
+.minute-top .unit:nth-child(6).on,
+.minute-top .unit:nth-child(9).on{
+  background-color: red;
+}
+.ref{
+  font-size: 8px;
+}
+
+.ctrl {
+  margin: auto;
+  text-align: center;
+}
+
+.input.row > input {
+  width: 20px;
+}
+
+.active {
+  margin: 20px auto;
+  width: 180px;
+  text-transform: uppercase;
+}
+
+
+    </style>
+  </head>
+  <body>
+    <div class="berlin-clock" id="mengenlehreuhr">
+      <div class="second-row row">
+        <div class="sec unit"></div>
+      </div>
+      <div class="hour-top row">
+        <div class="hour unit"></div>
+        <div class="hour unit"></div>
+        <div class="hour unit"></div>
+        <div class="hour unit"></div>
+      </div>
+      <div class="hour-bottom row">
+        <div class="hour unit"></div>
+        <div class="hour unit"></div>
+        <div class="hour unit"></div>
+        <div class="hour unit"></div>
+      </div>
+      <div class="minute-top row">
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+      </div>
+      <div class="minute-bottom row">
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+        <div class="min unit"></div>
+      </div>
+    </div>
+
+    <div class="ctrl" id="ctrl">
+      <div class="input row">
+        hh <input type="text" class="hours">
+        mm <input type="text" class="minutes">
+        ss <input type="text" class="seconds">
+        <button id="set">Set Clock</button>
+      </div>
+      <div class="button row">
+        <button id="start">Start</button>
+        <button id="stop">Stop</button>
+      </div>
+    </div>
+	
+	<div class="active">
+    Active viewers: <span class="users"></span>
+  <div>
+	
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<!-- mengenlehreuhr.js -->
+<script>
+var Mengenlehreuhr = function(dom) {
+  this.dom = $(dom);
+  this.update();
+}
+
+Mengenlehreuhr.prototype.update = function(d) {
+  var d = d || new Date()
+
+  this.setSecond(d.getSeconds());
+  this.setMinutes(d.getMinutes());
+  this.setHours(d.getHours());
+}
+
+Mengenlehreuhr.prototype.setSecond = function(s) {
+  this.dom.find('.second-row > div').toggleClass('on', (s % 2 === 1));
+}
+
+Mengenlehreuhr.prototype.setHours = function(h) {
+  var h2 = h % 5;
+  var h1 = (h - h2) / 5;
+
+  this.dom.find('.hour-top.row > div').each(function(i) {
+    $(this).toggleClass('on', (--h1 >= 0));
+  });
+
+  this.dom.find('.hour-bottom.row > div').each(function(i) {
+    $(this).toggleClass('on', (--h2 >= 0));
+  });
+}
+
+Mengenlehreuhr.prototype.setMinutes = function(m) {
+  var m2 = m % 5;
+  var m1 = (m - m2) / 5;
+
+  this.dom.find('.minute-top.row > div').each(function(i) {
+    $(this).toggleClass('on', (--m1 >= 0));
+  });
+
+  this.dom.find('.minute-bottom.row > div').each(function(i) {
+    $(this).toggleClass('on', (--m2 >= 0));
+  });
+}
+
+  $(document).ready(function(){
+    var clock = new Mengenlehreuhr('#mengenlehreuhr');
+    var time = null;
+
+    function updateInputs() {
+      var d = new Date()
+      $('#ctrl .input.row .hours').val(d.getHours());
+      $('#ctrl .input.row .minutes').val(d.getMinutes());
+      $('#ctrl .input.row .seconds').val(d.getSeconds());
+    }
+
+    function startInterval() {
+      updateInputs();
+      clock.update();
+      time = setInterval(function() {
+        clock.update();
+        updateInputs();
+      }, 1000);
+    }
+
+    function stopInterval() {
+      clearInterval(time);
+      time = null;
+    }
+
+    $('#start').bind('click', function() {
+      if (time != null) return;
+      startInterval();
+    });
+
+    $('#stop').bind('click', function() {
+      stopInterval();
+    });
+
+    $('#set').bind('click', function() {
+      stopInterval();
+
+      var h = $('#ctrl .input.row .hours').val();
+      var m = $('#ctrl .input.row .minutes').val();
+      var s = $('#ctrl .input.row .seconds').val();
+
+      clock.update(new Date(0, 0, 0, h, m, s));
+
+    });
+
+    updateInputs();
+    startInterval();
+
+  });
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+  socket.on('users', function (data) {
+    $('.active .users').text(data.activeViewers);
+    console.log(data);
+  });
+
+  socket.on('reconnect_failed', function (data) {
+    $('.active .users').text('Service unavailable');
+  });
+  
+
+</script>
+
+  </body>
+</html>
